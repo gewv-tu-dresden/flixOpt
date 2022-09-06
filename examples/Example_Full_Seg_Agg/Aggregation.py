@@ -87,9 +87,9 @@ esm1 = flixAgg.flixAggregation(name='TestAgg',  # Name des Modells, Ergebnisse w
                              hoursPerPeriod=hoursPerPeriod,  # gewünschte Periodenlänge, f#alls Zeitreihenaggregation
                              noTypicalPeriods=noOfPeriods,  # Anzahl typischer Perioden, falls Zeitreihenaggregation
                              # useExtremePeriods=False  # sollen Extremperioden verwendet werden? falls ja, werden vier zusätzliche typ. Perioden erstellt
-                             useExtremePeriods=True # sollen Extremperioden verwendet werden? falls ja, werden vier zusätzliche typ. Perioden erstellt
+                             useExtremePeriods=True # sollen Extremperioden verwendet werden? falls ja, werden vier zusätzliche typ. Perioden erstellt                                 
                              )
-
+esm1.weigthDict = {'Q_Netz/MW':0.1}
 esm1.cluster()
 esm1.declareTimeSets()        
 esm1.addTimeseriesData()
@@ -154,20 +154,34 @@ printVergleich('Q_Netz/MW')
 printVergleich('P_Netz/MW')
 
 
-def printVergleichZeit(columnStr):
-  fig = plt.figure(figsize =[30,15])
- 
-  plt.plot(ts   [columnStr], label='Original')#, lw=1.5)
-  plt.plot(tsAgg[columnStr], label='Original')#, lw=1.5)
+def printVergleichZeit(columnStr,start =1, ende = 35136):
   
-  plt.plot(ts   [columnStr][pd.to_datetime('2020-01-20 00:00'):pd.to_datetime('2020-01-20 23:45')], label='Original', lw=1.5)
-  plt.plot(tsAgg[columnStr][pd.to_datetime('2020-01-20 00:00'):pd.to_datetime('2020-01-20 23:45')], label='Original', lw=1.5)
+ 
+  # plt.plot(ts   [columnStr], label='Original')#, lw=1.5)
+  # plt.plot(tsAgg[columnStr], label='Original')#, lw=1.5)
+  
+  plt.plot(ts   [columnStr][start:ende], label='Orig '+ columnStr, lw=1.5)
+  plt.plot(tsAgg[columnStr][start:ende], '--', label='Agg '+ columnStr, lw=1.5)
+  # plt.plot(tsAgg[columnStr][pd.to_datetime(start):pd.to_datetime(ende)], label='Original', lw=1.5)
   # import matplotlib.dates as mdates
   # # Make ticks on occurrences of each month:
   # ax.xaxis.set_major_locator(mdates.MonthLocator())
   # # Get only the month to show in the x-axis:
   # ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
 
+fig = plt.figure(figsize =[30,15])  
 printVergleichZeit('P_Netz/MW')
-
 plt.show()
+
+printVergleichZeit('P_Netz/MW',start=1500,ende=2500)
+printVergleichZeit('Q_Netz/MW',start=1500,ende=2500)
+plt.legend()
+plt.show()
+
+indexe1= esm1.indexVectorsOfClusters[22][0]
+# indexe2= esm1.indexVectorsOfClusters[20][1]
+
+plt.plot(tsAgg['Q_Netz/MW'].values[indexe1])
+plt.plot(tsAgg['Q_Netz/MW'].values[indexe2],'--')
+plt.plot.show()
+esm1.indexVectorsOfClusters[20][1]
