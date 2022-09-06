@@ -195,7 +195,7 @@ aSpeicher = cStorage('Speicher',
                      avoidInAndOutAtOnce = True)
  
 aWaermeLast       = cSink  ('Wärmelast',sink   = cFlow('Q_th_Last' , bus = Fernwaerme, nominal_val = 1, val_rel = Q_th_Last))
-
+# aWaermeLast.sink.val_rel.setAggWeight(0.1)
 aStromLast       = cSink  ('Stromlast',sink   = cFlow('P_el_Last' , bus = Strom, nominal_val = 1,  val_rel = P_el_Last))
 
 aKohleTarif       = cSource('Kohletarif' ,source = cFlow('Q_Kohle'     , bus = Kohle  , nominal_val = 1000,  costsPerFlowHour= {costs: 4.6, CO2: 0.3}))
@@ -203,8 +203,10 @@ aKohleTarif       = cSource('Kohletarif' ,source = cFlow('Q_Kohle'     , bus = K
 aGasTarif         = cSource('Gastarif' ,source = cFlow('Q_Gas'     , bus = Gas, nominal_val = 1000, costsPerFlowHour= {costs: gP, CO2: 0.3}))
 
 aStromEinspeisung = cSink  ('Einspeisung'    ,sink   = cFlow('P_el'      , bus = Strom, nominal_val = 1000, costsPerFlowHour = -(p_el-0.5)))
+aStromEinspeisung.sink.costsPerFlowHour[None].setAggWeight(.5)
 
 aStromTarif       = cSource('Stromtarif' ,source = cFlow('P_el'     , bus = Strom  , nominal_val = 1000, costsPerFlowHour= {costs: (p_el+0.5), CO2: 0.3}))
+aStromTarif.source.costsPerFlowHour[costs].setAggWeight(.5)
 
 # Zusammenführung:
 es = cEnergySystem(aTimeSeries, dt_last=None)
@@ -265,6 +267,8 @@ if doAggregatedCalc :
     
     calcAgg.solve(solverProps, nameSuffix = nameSuffix)
     listOfCalcs.append(calcAgg)
+
+
 
 #########################
 ## some plots directly ##
@@ -329,17 +333,20 @@ import flixPostprocessing as flixPost
 
 listOfResults = []
 
-full = flixPost.flix_results(calcFull.nameOfCalc)
-listOfResults.append(full)
-del calcFull
+if doFullCalc:
+    full = flixPost.flix_results(calcFull.nameOfCalc)
+    listOfResults.append(full)
+    del calcFull
 
-agg = flixPost.flix_results(calcAgg.nameOfCalc)
-listOfResults.append(agg)
-del calcAgg
+if doAggregatedCalc:
+    agg = flixPost.flix_results(calcAgg.nameOfCalc)
+    listOfResults.append(agg)
+    del calcAgg
 
-seg = flixPost.flix_results(calcSegs.nameOfCalc)
-listOfResults.append(seg)
-del calcSegs
+if doSegmentedCalc:
+    seg = flixPost.flix_results(calcSegs.nameOfCalc)
+    listOfResults.append(seg)
+    del calcSegs
 
 ###### plotting #######
 

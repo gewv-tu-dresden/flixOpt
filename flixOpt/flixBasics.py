@@ -121,6 +121,8 @@ class cTS_vector:
     self.__timeIndexe_actual = None # aktuelle timeIndexe der modBox
     
     owner.TS_list.append(self)    
+    
+    self.weight_agg = 1 # weight for Aggregation method # between 0..1, normally 1
 
   @staticmethod
   def __makeSkalarIfPossible(d):        
@@ -147,6 +149,13 @@ class cTS_vector:
              
     self.d_i_explicit = self.__makeSkalarIfPossible(d_i_explicit)
 
+  def setAggWeight(self, aWeight):
+      '''
+      only for aggregation: set weight of timeseries for creating of typical periods!
+      '''
+      self.weight_agg = aWeight
+      if (aWeight > 1) or (aWeight < 0) :
+          raise Exception('weigth must be between 0 and 1!')
   
   # Rückgabe Maximum
   def max(self):

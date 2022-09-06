@@ -752,6 +752,7 @@ class cCalculation :
     self.durations = {} # Dauer der einzelnen Dinge
     self.durations['modeling'] = 0
     self.durations['solving'] = 0
+    self.TSlistForAggregation = None # list of timeseries for aggregation
     # assert from_index < to_index
     # assert from_index >= 0
     # assert to_index <= len(self.es.timeSeries)-1    
@@ -901,14 +902,24 @@ class cCalculation :
         raise Exception('!!! Achtung Aggregation geht nicht, da unterschiedliche delta_t von ' + str(min(dtInHours)) + ' bis ' + str(max(dtInHours)) + ' h')
     
     # TS Liste ohne Skalare:
-    newTSList = [item for item in self.es.allTSinMEs if item.isArray]
+    self.TSlistForAggregation = [item for item in self.es.allTSinMEs if item.isArray]
     
     # print(newTSList)
     TS: cTS_vector
-    for TS in newTSList: print(TS.label_full)
+    print('used TS for aggregation:')
+    for TS in self.TSlistForAggregation : 
+        print(' ->' + TS.label_full + ' (weight: ' + str(TS.weight_agg) + ')')        
     
     # Daten für Aggregation vorbereiten:
-    seriesDict = {i : newTSList[i].d_i_raw_vec for i in range(len(newTSList))}    
+    seriesDict = {}
+    weightDict = {}
+    for i in range(len(self.TSlistForAggregation)):
+        aTS : cTS_vector
+        aTS = self.TSlistForAggregation[i]
+        seriesDict[i] = aTS.d_i_raw_vec # Vektor zuweisen!
+        weightDict[i] = aTS.weight_agg # Wichtung zuweisen!
+
+    # seriesDict = {i : self.TSlistForAggregation[i].d_i_raw_vec for i in range(len(self.TSlistForAggregation))}    
     import pandas as pd
     dfSeries = pd.DataFrame(seriesDict, index = chosenTimeSeries)# eigentlich wäre TS als column schön, aber TSAM will die ordnen können.       
 
@@ -926,7 +937,8 @@ class cCalculation :
                                       hoursPerPeriod = periodLengthInHours,
                                       hasTSA = False,
                                       noTypicalPeriods = noTypicalPeriods,
-                                      useExtremePeriods = useExtremePeriods)
+                                      useExtremePeriods = useExtremePeriods,
+                                      weightDict = weightDict)
     
     
     
@@ -954,11 +966,20 @@ class cCalculation :
     else:
       # neue (Explizit)-Werte für TS sammeln::        
       TS_explicit = {}
-      for i in range(len(newTSList)):
-        TS = newTSList[i]
+      for i in range(len(self.TSlistForAggregation)):
+        TS = self.TSlistForAggregation[i]
         # todo: agg-Wert für TS:
         TS_explicit[TS] = dataAgg.totalTimeseries[i].values # nur data-array ohne Zeit   
-      
+    
+    
+    import matplotlib.pyplot as plt        
+    plt.title('aggregated series')
+    plt.plot(dfSeries.values)
+    for i in range(len(self.TSlistForAggregation)):
+        plt.plot(dataAgg.totalTimeseries[i].values,'--', label = str(i))
+    plt.legend()
+    plt.show()
+    
     ##########################
     # System finalisieren:
     self.es.finalize()

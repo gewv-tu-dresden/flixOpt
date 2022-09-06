@@ -40,6 +40,7 @@ class flixAggregation:
                  hasTSA=False,
                  noTypicalPeriods=8,
                  useExtremePeriods=False,
+                 weightDict = None
 
                  ):
 
@@ -51,7 +52,7 @@ class flixAggregation:
 
         self.name = name
         self.timeseries = copy.deepcopy(timeseries)
-        
+        self.weightDict = weightDict
         
         self.hoursPerTimeStep = hoursPerTimeStep
         self.hoursPerPeriod = hoursPerPeriod
@@ -106,6 +107,7 @@ class flixAggregation:
                                                  resolution=self.hoursPerTimeStep,
                                                  clusterMethod='k_means',
                                                  extremePeriodMethod=self.extremePeriodMethod, #flixi: 'None'/'new_cluster_center'
+                                                 weightDict=self.weightDict,    
                                                  #addPeakMax=['P_Netz/MW', 'Q_Netz/MW', 'Strompr.€/MWh'],
                                                  #addPeakMin=['Strompr.€/MWh']
                                                  )
