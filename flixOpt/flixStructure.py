@@ -901,14 +901,10 @@ class cCalculation :
     if max(dtInHours)-min(dtInHours) != 0:
         raise Exception('!!! Achtung Aggregation geht nicht, da unterschiedliche delta_t von ' + str(min(dtInHours)) + ' bis ' + str(max(dtInHours)) + ' h')
     
-    # TS Liste ohne Skalare:
+    # TSlist and TScollection ohne Skalare:
     self.TSlistForAggregation = [item for item in self.es.allTSinMEs if item.isArray]
-    
-    # print(newTSList)
-    TS: cTS_vector
-    print('used TS for aggregation:')
-    for TS in self.TSlistForAggregation : 
-        print(' ->' + TS.label_full + ' (weight: ' + str(TS.weight_agg) + ')')        
+    self.TScollectionForAgg = cTS_collection(self.TSlistForAggregation)
+    self.TScollectionForAgg.print()   
     
     # Daten für Aggregation vorbereiten:
     seriesDict = {}
@@ -917,7 +913,7 @@ class cCalculation :
         aTS : cTS_vector
         aTS = self.TSlistForAggregation[i]
         seriesDict[i] = aTS.d_i_raw_vec # Vektor zuweisen!
-        weightDict[i] = aTS.weight_agg # Wichtung zuweisen!
+        weightDict[i] = self.TScollectionForAgg.getWeight(aTS) # Wichtung ermitteln!
 
     # seriesDict = {i : self.TSlistForAggregation[i].d_i_raw_vec for i in range(len(self.TSlistForAggregation))}    
     import pandas as pd
@@ -2178,5 +2174,8 @@ class cFlow(cME):
   
 #   def getBeforeValue(self):
 #     if 
+
+
   
+
 

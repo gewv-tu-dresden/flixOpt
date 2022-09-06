@@ -23,10 +23,10 @@ nameSuffix = '_' + solver_name # for saving-file
 ## Auswahl Rechentypen: ##
 
 doFullCalc = True
-# doFullCalc = False
+doFullCalc = False
 
 doSegmentedCalc = True
-# doSegmentedCalc = False
+doSegmentedCalc = False
 
 doAggregatedCalc = True
 # doAggregatedCalc = False
@@ -137,6 +137,8 @@ aTimeSeries = aTimeSeries.astype('datetime64')
 
 from flixStructure import *
 from flixComps    import *
+from flixBasicsPublic import *
+
 import pandas as pd
 import logging as log
 import os # für logging
@@ -202,10 +204,14 @@ aKohleTarif       = cSource('Kohletarif' ,source = cFlow('Q_Kohle'     , bus = K
 
 aGasTarif         = cSource('Gastarif' ,source = cFlow('Q_Gas'     , bus = Gas, nominal_val = 1000, costsPerFlowHour= {costs: gP, CO2: 0.3}))
 
-aStromEinspeisung = cSink  ('Einspeisung'    ,sink   = cFlow('P_el'      , bus = Strom, nominal_val = 1000, costsPerFlowHour = -(p_el-0.5)))
+
+# two timeseries are same aggType
+p_feed_in = cTSraw(-(p_el-0.5), agg_type='p_el')
+p_sell    = cTSraw(  p_el+0.5 , agg_type='p_el')
+aStromEinspeisung = cSink  ('Einspeisung'    ,sink   = cFlow('P_el'      , bus = Strom, nominal_val = 1000, costsPerFlowHour = p_feed_in))
 aStromEinspeisung.sink.costsPerFlowHour[None].setAggWeight(.5)
 
-aStromTarif       = cSource('Stromtarif' ,source = cFlow('P_el'     , bus = Strom  , nominal_val = 1000, costsPerFlowHour= {costs: (p_el+0.5), CO2: 0.3}))
+aStromTarif       = cSource('Stromtarif' ,source = cFlow('P_el'     , bus = Strom  , nominal_val = 1000, costsPerFlowHour= {costs: p_sell, CO2: 0.3}))
 aStromTarif.source.costsPerFlowHour[costs].setAggWeight(.5)
 
 # Zusammenführung:

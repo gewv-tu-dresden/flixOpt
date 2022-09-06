@@ -7,6 +7,7 @@ Created on Wed Mar 31 22:51:38 2021
 
 import numpy as np
 import flixOptHelperFcts as helpers
+from flixBasicsPublic import cTSraw
 
 # stellt Infrastruktur printInitArgs() etc zur Verfügung:
 # gibt Warnung, falls unbenutzte kwargs vorhanden!
@@ -112,8 +113,23 @@ class cTS_vector:
     
         
   def __init__(self, label, value, owner):    
+    '''     
+    Parameters
+    ----------
+    value : 
+        scalar, array or cTSraw!
+    owner : 
+    '''
     self.label  = label
     self.owner = owner
+    
+    # if value is cTSraw, then extract value:
+    if isinstance(value, cTSraw):
+        self.TSraw = value
+        value = self.TSraw.value # extract value
+    else:
+        self.TSraw = None        
+        
     
     self.d = self.__makeSkalarIfPossible(value) # (d wie data), d so knapp wie möglich speichern
     self.d_i_explicit = None #     
@@ -171,6 +187,46 @@ class cTS_vector:
     else:
       return max(aValue)
 
+
+# calculates weights of TS_vector for being in that collection (depending on )
+class cTS_collection():
+    def __init__(self, listOfTS_vectors):
+        self.list = listOfTS_vectors
+        # i.g.: self.agg_type_count = {'solar': 3, 'price_el' = 2}
+        self.agg_type_count = self.get_agg_type_count()
+
+    def get_agg_type_count(self):
+        # count agg_types:
+        from collections import Counter        
+        
+        TSlistWithAggType = []
+        for TS in self.list:
+            if (TS.TSraw is not None) and (TS.TSraw.agg_type is not None):
+                TSlistWithAggType.append(TS)        
+        agg_types = (aTS.TSraw.agg_type for aTS in TSlistWithAggType)
+        return Counter(agg_types)    
+    
+    
+    def getWeight(self, aTS:cTS_vector):
+        if aTS.TSraw is None:
+            # default:
+            weight = 1
+        elif aTS.TSraw.agg_weight is not None:
+            # explicit:
+            weight = aTS.TSraw.agg_weight 
+        elif aTS.TSraw.agg_type is not None:
+            # via agg_type:
+            # i.g. n=3 -> weight=1/3
+            weight = 1/self.agg_type_count[aTS.TSraw.agg_type]
+        else:
+            raise Exception('TSraw is without weight definition')
+        return weight
+    
+    def print(self):
+        print('used TS for aggregation:')    
+        for TS in self.list : 
+            print(' ->' + TS.label_full + ' (weight: ' + str(self.getWeight(TS)) + ')')                
+                        
 
 # if costs is given without effectType, standardeffect is related
   # costs = {20}                      -> {None:20}
