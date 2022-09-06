@@ -16,7 +16,7 @@ class cTSraw:
         val_rel_solar1 = cTS(sol_array_1, type = 'solar')
         val_rel_solar2 = cTS(sol_array_2, type = 'solar')
         val_rel_solar3 = cTS(sol_array_3, type = 'solar')    
-        --> this 3 series of same type will internally assigned weight = 1/3 
+        --> this 3 series of same type share one weight, i.e. internally assigned each weight = 1/3 
         (instead of standard weight = 1)
         
     Parameters
