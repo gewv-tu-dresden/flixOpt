@@ -901,6 +901,10 @@ class cCalculation :
     if max(dtInHours)-min(dtInHours) != 0:
         raise Exception('!!! Achtung Aggregation geht nicht, da unterschiedliche delta_t von ' + str(min(dtInHours)) + ' bis ' + str(max(dtInHours)) + ' h')
     
+    
+    print('#########################')
+    print('## TS for aggregation ###')
+    
     # TSlist and TScollection ohne Skalare:
     self.TSlistForAggregation = [item for item in self.es.allTSinMEs if item.isArray]
     self.TScollectionForAgg = cTS_collection(self.TSlistForAggregation)

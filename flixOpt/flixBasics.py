@@ -201,11 +201,18 @@ class cTS_collection():
         
         TSlistWithAggType = []
         for TS in self.list:
-            if (TS.TSraw is not None) and (TS.TSraw.agg_type is not None):
+            if self.get_agg_type(TS) is not None:
                 TSlistWithAggType.append(TS)        
         agg_types = (aTS.TSraw.agg_type for aTS in TSlistWithAggType)
         return Counter(agg_types)    
     
+    
+    def get_agg_type(self, aTS:cTS_vector):
+        if (aTS.TSraw is not None) :
+            agg_type = aTS.TSraw.agg_type
+        else:
+            agg_type = None
+        return agg_type
     
     def getWeight(self, aTS:cTS_vector):
         if aTS.TSraw is None:
@@ -223,10 +230,14 @@ class cTS_collection():
         return weight
     
     def print(self):
-        print('used TS for aggregation:')    
+        print('used ' + str(len(self.list)) + ' TS for aggregation:')    
         for TS in self.list : 
-            print(' ->' + TS.label_full + ' (weight: ' + str(self.getWeight(TS)) + ')')                
-                        
+            print(' ->' + TS.label_full + ' (weight: ' + str(self.getWeight(TS)) + '; agg_type: ' + str(self.get_agg_type(TS))+ ')')                
+        if len(self.agg_type_count.keys()) > 0:
+            print('agg_types: ' + str(list(self.agg_type_count.keys())))
+        else:
+            print('Warning!: no agg_types defined, i.e. all TS have weigth 1 (or explicit given weight)!')
+                                
 
 # if costs is given without effectType, standardeffect is related
   # costs = {20}                      -> {None:20}
