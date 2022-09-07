@@ -22,7 +22,7 @@ flixOpt is based on matlab framework flixOptMat developed in project FAKS.
 You can choose between three calculation modes:
   * **full** -> exact and slow
   * **segmented** (with variable time overlap) -> fast but not exact for big storages
-  * **aggregated** (automatically creation of typical periods via [TSAM](https://github.com/FZJ-IEK3-VSA/tsam "more info") -> fast, quite exact
+  * **aggregated** (automatically creation of typical periods via [TSAM](https://github.com/FZJ-IEK3-VSA/tsam "more info")) -> fast, quite exact
 ## citing
 For explicitly citing, a link to a paper is coming soon ...
 
