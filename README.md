@@ -15,7 +15,7 @@ flixOpt is based on matlab framework flixOptMat developed in project FAKS.
     * invest costs and invest size
   * effects 
     * various effects, i.g. costs, CO2 emissions, primary energy, area demand etc.
-    * effects coupleable (specific costs of CO2-emissions)
+    * effects coupleable, i.g. specific costs of CO2-emissions
     * constraints, i.g. max sum of CO2 emissions
 
 ## performance issues
