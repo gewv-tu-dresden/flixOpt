@@ -5,7 +5,7 @@ vector based energy optimization framework in python
 
 flixOpt is developed in project SMARTBIOGRID by [TU Dresden](https://github.com/gewv-tu-dresden)
 
-flixOpt is based on matlab framework flixOptMat developed in project FAKS [TU Dresden](https://github.com/gewv-tu-dresden) and has a few influences from [oemof/solph](https://github.com/oemof/oemof-solph) (Great thanks for your tool!)
+flixOpt is based on matlab framework flixOptMat developed in project FAKS by [TU Dresden](https://github.com/gewv-tu-dresden) and has a few influences from [oemof/solph](https://github.com/oemof/oemof-solph) (Great thanks for your tool!)
 ## key features
   * architecture allows integration of other modeling languages than [Pyomo](http://www.pyomo.org/)
   * many constraints available
