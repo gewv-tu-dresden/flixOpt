@@ -232,7 +232,8 @@ class cTS_collection():
     def print(self):
         print('used ' + str(len(self.list)) + ' TS for aggregation:')    
         for TS in self.list : 
-            print(' ->' + TS.label_full + ' (weight: ' + str(self.getWeight(TS)) + '; agg_type: ' + str(self.get_agg_type(TS))+ ')')                
+            aStr = ' ->' + TS.label_full + ' (weight: {:.4f}; agg_type: ' + str(self.get_agg_type(TS))+ ')'
+            print(aStr.format(self.getWeight(TS)))
         if len(self.agg_type_count.keys()) > 0:
             print('agg_types: ' + str(list(self.agg_type_count.keys())))
         else:
