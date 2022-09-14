@@ -268,8 +268,24 @@ class flix_results():
     #       color='black', fontsize=10)
     plt.show()
     
-  def plotInAndOuts(self, busOrComponent, stacked = False, renderer='browser', minFlowHours=0.1, plotAsPlotly = False):      
+  def plotInAndOuts(self, busOrComponent, stacked = False, renderer='browser', minFlowHours=0.1, plotAsPlotly = False, title = None):      
+    '''      
+    Parameters
+    ----------
+    busOrComponent : TYPE
+        DESCRIPTION.
+    stacked : TYPE, optional
+        DESCRIPTION. The default is False.
+    renderer : TYPE, optional
+        DESCRIPTION. The default is 'browser'.
+    minFlowHours : TYPE, optional
+        DESCRIPTION. The default is 0.1.
+    plotAsPlotly : boolean, optional
+    
+    title : str, optional
+        if None, then automatical title is used
 
+    '''
     if not (busOrComponent in self.results.keys()):
       raise Exception(str(busOrComp) + 'is no valid bus or component name')
 
@@ -316,7 +332,10 @@ class flix_results():
 
     y_in = appendEndTimeStep(y_in)
     y_out = appendEndTimeStep(y_out)
-    title = busOrComponent + ': '+ ' in (+) and outs (-)' + ' [' + self.label + ']'
+
+    # wenn title nicht gegeben
+    if title is None:
+        title = busOrComponent + ': '+ ' in (+) and outs (-)' + ' [' + self.label + ']'
     yaxes_title = 'Flow'
     yaxes2_title = 'charge state'
 
