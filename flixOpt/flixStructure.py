@@ -260,7 +260,6 @@ class cModelBoxOfES(cBaseModel): # Hier kommen die ModellingLanguage-spezifische
         for aInvestFeature in self.es.allInvestFeatures:
             investValue = aInvestFeature.mod.var_investmentSize.getResult()
             investValue = float(investValue) # bei np.floats Probleme bei Speichern
-            print(investValue)
             # umwandeln von numpy:
             if isinstance(investValue, np.ndarray):
                 investValue = investValue.tolist()
