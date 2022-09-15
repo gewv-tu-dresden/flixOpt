@@ -667,7 +667,7 @@ class cFeatureInvest(cFeature):
     if self.args.investmentSize_is_fixed:      
       assert ((self.fixedInvestmentSize is not None) and (self.fixedInvestmentSize != 0)) , 'fixedInvestmentSize muss gesetzt werden'
     else:
-      assert self.fixedInvestmentSize is None, 'fixedInvestmentSize of ' +self.owner.label_full +' must be None if investmentSize is variable'
+      assert self.fixedInvestmentSize is None, '!' + self.nameOfInvestmentSize + ' of ' +self.owner.label_full +' must be None if investmentSize is variable'
 
   def getMinMaxOfDefiningVar(self):      
     

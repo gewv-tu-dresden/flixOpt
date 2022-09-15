@@ -61,7 +61,7 @@ def zerosToNans(aVector):
   return nanVector
   
 def checkBoundsOfParameter(aParam,aParamLabel,aBounds,aObject=None):
-  if (aParam < aBounds[0]) | (aParam >= aBounds[1]):
+  if np.any(aParam < aBounds[0]) | np.any(aParam >= aBounds[1]):
     raise Exception(aParamLabel + ' verletzt min/max - Grenzen!')
     
 # löscht alle in Attributen ungültigen Zeichen: todo: Vollständiger machen!
