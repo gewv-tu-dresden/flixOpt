@@ -142,7 +142,31 @@ class cModelBoxOfES(cBaseModel): # Hier kommen die ModellingLanguage-spezifische
 
   
   #'gurobi'
-  def solve(self, gapFrac = 0.02,timelimit = 3600, solver ='cbc', displaySolverOutput = True, **kwargs):      
+  def solve(self, gapFrac = 0.02,timelimit = 3600, solver ='cbc', displaySolverOutput = True, excessThreshold = 0.1, **kwargs):      
+      '''
+      
+
+      Parameters
+      ----------
+      gapFrac : TYPE, optional
+          DESCRIPTION. The default is 0.02.
+      timelimit : TYPE, optional
+          DESCRIPTION. The default is 3600.
+      solver : TYPE, optional
+          DESCRIPTION. The default is 'cbc'.
+      displaySolverOutput : TYPE, optional
+          DESCRIPTION. The default is True.
+      excessThreshold : float, positive!
+          threshold for excess: If sum(Excess)>excessThreshold a warning is raised, that an excess is occurs
+      **kwargs : TYPE
+          DESCRIPTION.
+
+      Returns
+      -------
+      main_results_str : TYPE
+          DESCRIPTION.
+
+      '''
       
           
       
@@ -226,7 +250,7 @@ class cModelBoxOfES(cBaseModel): # Hier kommen die ModellingLanguage-spezifische
         main_results_str['busesWithExcess'] = busesWithExcess
         for aBus in self.es.setOfBuses:
           if aBus.withExcess : 
-            if any(self.results[aBus.label]['excessIn'] > 0) or any(self.results[aBus.label]['excessOut'] > 0):
+            if sum(self.results[aBus.label]['excessIn']) > excessThreshold or sum(self.results[aBus.label]['excessOut']) > excessThreshold:
               busesWithExcess.append(aBus.label)      
         
         aDict = {}
