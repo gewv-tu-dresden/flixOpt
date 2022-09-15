@@ -17,6 +17,8 @@ Created on Fri Sep  4 11:26:10 2020
    # Binärvariablen ohne max-Wert-Vorgabe des Flows (Binärungenauigkeitsproblem)
    # Medien-zulässigkeit 
    
+# TODO:
+    #  Effektbeispiel mit Anzahl (z.b. Kesselanzahl < 3) 
 
 ### Inputs: ####
 # Solver-Inputs:
