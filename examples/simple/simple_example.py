@@ -2,13 +2,13 @@
 ## PreProcessing + Solving: ##
 ##############################
 
-import Simple_example_PreProcessing
+import simple_example_PreProcessing
 
 # Name der Rechnung:
-nameOfCalc = Simple_example_PreProcessing.aCalc.nameOfCalc
+nameOfCalc = simple_example_PreProcessing.aCalc.nameOfCalc
 
-if hasattr(Simple_example_PreProcessing, 'calcSegs'): 
-  nameOfCalcSegs = Simple_example_PreProcessing.calcSegs.nameOfCalc
+if hasattr(simple_example_PreProcessing, 'calcSegs'): 
+  nameOfCalcSegs = simple_example_PreProcessing.calcSegs.nameOfCalc
 else:
   nameOfCalcSegs = None
 print(nameOfCalc)
