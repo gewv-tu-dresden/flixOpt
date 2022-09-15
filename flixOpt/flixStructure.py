@@ -253,10 +253,22 @@ class cModelBoxOfES(cBaseModel): # Hier kommen die ModellingLanguage-spezifische
             if sum(self.results[aBus.label]['excessIn']) > excessThreshold or sum(self.results[aBus.label]['excessOut']) > excessThreshold:
               busesWithExcess.append(aBus.label)      
         
-        aDict = {}
+        aDict = {'invested':{},
+                 'not invested':{}
+                 }
         main_results_str['Invest-Decisions']=aDict
         for aInvestFeature in self.es.allInvestFeatures:
-          aDict[aInvestFeature.owner.label_full] = str(aInvestFeature.mod.var_investmentSize.getResult())
+            investValue = aInvestFeature.mod.var_investmentSize.getResult()
+            investValue = float(investValue) # bei np.floats Probleme bei Speichern
+            print(investValue)
+            # umwandeln von numpy:
+            if isinstance(investValue, np.ndarray):
+                investValue = investValue.tolist()
+            label = aInvestFeature.owner.label_full
+            if investValue > 1e-3:
+                aDict['invested'][label] = investValue
+            else:
+                aDict['not invested'][label] = investValue
       
         return main_results_str
       
