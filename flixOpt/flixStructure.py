@@ -1012,7 +1012,8 @@ class cCalculation :
     plt.plot(dfSeries.values)
     for i in range(len(self.TSlistForAggregation)):
         plt.plot(dataAgg.totalTimeseries[i].values,'--', label = str(i))
-    plt.legend()
+    if len(self.TSlistForAggregation) < 10: # wenn nicht zu viele
+        plt.legend()
     plt.show()
     
     ##########################
@@ -1356,9 +1357,15 @@ class cME(cArgsClass):
     print(shiftChars + self.label + ':')
     print(yaml.dump(self.getVarsAsStr(),
               allow_unicode = True))
-
-
-
+  def getEqsVarsOverview(self):
+    aDict = {}
+    aDict['no eqs']          = len(self.mod.eqs)
+    aDict['no eqs single']   = sum([eq.nrOfSingleEquations for eq in self.mod.eqs])
+    aDict['no inEqs']        = len(self.mod.ineqs)
+    aDict['no inEqs single'] = sum([ineq.nrOfSingleEquations for ineq in self.mod.ineqs])
+    aDict['no vars']         = len(self.mod.variables)
+    aDict['no vars single']  =  sum([var.len for var in self.mod.variables])  
+    return aDict
 
 # Definition Effekt (Kosten, CO2,...)     
 class cEffectType(cME) : 
