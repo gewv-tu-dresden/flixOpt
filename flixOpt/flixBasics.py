@@ -188,33 +188,82 @@ class cTS_vector:
       return max(aValue)
 
 
+
 # calculates weights of TS_vector for being in that collection (depending on )
 class cTS_collection():
-    def __init__(self, listOfTS_vectors):
-        self.list = listOfTS_vectors
-        # i.g.: self.agg_type_count = {'solar': 3, 'price_el' = 2}
-        self.agg_type_count = self.get_agg_type_count()
+    
+    @property
+    def addPeak_Max_numbers(self):
+        if self._addPeakMax_numbers == []:
+            return None
+        else :
+            return self._addPeakMax_numbers 
 
-    def get_agg_type_count(self):
+    @property
+    def addPeak_Min_numbers(self):
+        if self._addPeakMin_numbers == []:
+            return None
+        else :
+            return self._addPeakMin_numbers 
+        
+    
+    def __init__(self, listOfTS_vectors, addPeakMax_TSraw = [], addPeakMin_TSraw = []):
+        self.listOfTS_vectors = listOfTS_vectors
+        self.addPeakMax_TSraw = addPeakMax_TSraw
+        self.addPeakMin_TSraw = addPeakMin_TSraw
+        # i.g.: self.agg_type_count = {'solar': 3, 'price_el' = 2}
+        self.agg_type_count = self._get_agg_type_count()
+        
+        self._checkPeak_TSraw(addPeakMax_TSraw)
+        self._checkPeak_TSraw(addPeakMin_TSraw)
+        
+        # these 4 attributes are now filled:
+        self.seriesDict = None
+        self.weightDict = None
+        self.addPeakMax_numbers = None
+        self.addPeakMin_numbers = None
+        self.calculateParametersForTSAM()
+
+    def calculateParametersForTSAM(self):
+        # Daten für Aggregation vorbereiten:
+        self.seriesDict = {}
+        self.weightDict = {}
+        self._addPeakMax_numbers = []
+        self._addPeakMin_numbers = []
+                
+        # index i is the key/name of the series!
+        for i in range(len(self.listOfTS_vectors)):
+            aTS : cTS_vector
+            aTS = self.listOfTS_vectors[i]
+            self.seriesDict[i] = aTS.d_i_raw_vec # Vektor zuweisen!# TODO: müsste doch d_i sein, damit abhängig von Auswahlzeitraum, oder???
+            self.weightDict[i] = self._getWeight(aTS) # Wichtung ermitteln!            
+            if (aTS.TSraw is not None):
+                if aTS.TSraw in self.addPeakMax_TSraw :
+                    self._addPeakMax_numbers.append(i)
+                if aTS.TSraw in self.addPeakMin_TSraw :
+                    self._addPeakMin_numbers.append(i)
+
+    
+    def _get_agg_type_count(self):
         # count agg_types:
         from collections import Counter        
         
         TSlistWithAggType = []
-        for TS in self.list:
-            if self.get_agg_type(TS) is not None:
+        for TS in self.listOfTS_vectors:
+            if self._get_agg_type(TS) is not None:
                 TSlistWithAggType.append(TS)        
         agg_types = (aTS.TSraw.agg_type for aTS in TSlistWithAggType)
         return Counter(agg_types)    
     
     
-    def get_agg_type(self, aTS:cTS_vector):
+    def _get_agg_type(self, aTS:cTS_vector):
         if (aTS.TSraw is not None) :
             agg_type = aTS.TSraw.agg_type
         else:
             agg_type = None
         return agg_type
     
-    def getWeight(self, aTS:cTS_vector):
+    def _getWeight(self, aTS:cTS_vector):
         if aTS.TSraw is None:
             # default:
             weight = 1
@@ -229,11 +278,17 @@ class cTS_collection():
             raise Exception('TSraw is without weight definition')
         return weight
     
+    def _checkPeak_TSraw(self, aTSrawlist):
+        if aTSrawlist is not None:
+            for aTSraw in aTSrawlist:
+                if not isinstance(aTSraw,cTSraw):
+                    raise Exception('addPeak_max/min must be list of cTSraw-objects!')
+        
     def print(self):
-        print('used ' + str(len(self.list)) + ' TS for aggregation:')    
-        for TS in self.list : 
-            aStr = ' ->' + TS.label_full + ' (weight: {:.4f}; agg_type: ' + str(self.get_agg_type(TS))+ ')'
-            print(aStr.format(self.getWeight(TS)))
+        print('used ' + str(len(self.listOfTS_vectors)) + ' TS for aggregation:')    
+        for TS in self.listOfTS_vectors : 
+            aStr = ' ->' + TS.label_full + ' (weight: {:.4f}; agg_type: ' + str(self._get_agg_type(TS))+ ')'
+            print(aStr.format(self._getWeight(TS)))
         if len(self.agg_type_count.keys()) > 0:
             print('agg_types: ' + str(list(self.agg_type_count.keys())))
         else:

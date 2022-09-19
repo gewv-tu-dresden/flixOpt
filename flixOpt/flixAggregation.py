@@ -39,9 +39,10 @@ class flixAggregation:
                  hoursPerPeriod,
                  hasTSA=False,
                  noTypicalPeriods=8,
-                 useExtremePeriods=False,
-                 weightDict = None
-
+                 useExtremePeriods=True,
+                 weightDict = None,
+                 addPeakMax = None,
+                 addPeakMin = None
                  ):
 
         """ 
@@ -53,7 +54,8 @@ class flixAggregation:
         self.name = name
         self.timeseries = copy.deepcopy(timeseries)
         self.weightDict = weightDict
-        
+        self.addPeakMax = addPeakMax   
+        self.addPeakMin = addPeakMin
         self.hoursPerTimeStep = hoursPerTimeStep
         self.hoursPerPeriod = hoursPerPeriod
         self.hasTSA = hasTSA
@@ -108,7 +110,8 @@ class flixAggregation:
                                                  clusterMethod='k_means',
                                                  extremePeriodMethod=self.extremePeriodMethod, #flixi: 'None'/'new_cluster_center'
                                                  weightDict=self.weightDict,    
-                                                 #addPeakMax=['P_Netz/MW', 'Q_Netz/MW', 'Strompr.€/MWh'],
+                                                 addPeakMax = self.addPeakMax, #['P_Netz/MW', 'Q_Netz/MW', 'Strompr.€/MWh'],
+                                                 addPeakMin= self.addPeakMin
                                                  #addPeakMin=['Strompr.€/MWh']
                                                  )
         self.aggregation = aggregation
@@ -197,9 +200,9 @@ class flixAggregation:
         if self.useExtremePeriods:
           print('extremePeriods:')
           # Zeitreihe rauslöschen:                        
-          extremePeriods = self.aggregation.extremePeriods
+          extremePeriods = self.aggregation.extremePeriods.copy() 
           for key,val in extremePeriods.items():
-            del(extremPeriods[key]['profile'])
+            del(extremePeriods[key]['profile'])
           print(extremePeriods)
           print ('########################')            
         

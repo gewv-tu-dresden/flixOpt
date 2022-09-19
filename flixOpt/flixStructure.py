@@ -911,7 +911,48 @@ class cCalculation :
     
     self._saveSolveInfos(namePrefix=namePrefix, nameSuffix=nameSuffix, aPath=aPath)
   
-  def doAggregatedModeling(self, periodLengthInHours, noTypicalPeriods, useExtremePeriods, fixStorageFlows, fixBinaryVarsOnly, percentageOfPeriodFreedom = 0, costsOfPeriodFreedom = 0):
+  def doAggregatedModeling(self, periodLengthInHours, noTypicalPeriods, 
+                           useExtremePeriods, fixStorageFlows,
+                           fixBinaryVarsOnly, percentageOfPeriodFreedom = 0,
+                           costsOfPeriodFreedom = 0,
+                           addPeakMax = [],
+                           addPeakMin = []):
+    '''
+      
+
+      Parameters
+      ----------
+      periodLengthInHours : TYPE
+          DESCRIPTION.
+      noTypicalPeriods : TYPE
+          DESCRIPTION.
+      useExtremePeriods : TYPE
+          DESCRIPTION.
+      fixStorageFlows : TYPE
+          DESCRIPTION.
+      fixBinaryVarsOnly : TYPE
+          DESCRIPTION.
+      percentageOfPeriodFreedom : TYPE, optional
+          DESCRIPTION. The default is 0.
+      costsOfPeriodFreedom : TYPE, optional
+          DESCRIPTION. The default is 0.
+
+      addPeakMax : list of cTSraw ...
+          
+      addPeakMin : list of cTSraw
+          
+
+      Raises
+      ------
+      Exception
+          DESCRIPTION.
+
+      Returns
+      -------
+      aModBox : TYPE
+          DESCRIPTION.
+
+      '''
     self.checkIfAlreadyModeled()
     
 
@@ -939,24 +980,19 @@ class cCalculation :
     
     print('#########################')
     print('## TS for aggregation ###')
-    
+
+    ## Daten für Aggregation vorbereiten:    
     # TSlist and TScollection ohne Skalare:
     self.TSlistForAggregation = [item for item in self.es.allTSinMEs if item.isArray]
-    self.TScollectionForAgg = cTS_collection(self.TSlistForAggregation)
+    self.TScollectionForAgg = cTS_collection(self.TSlistForAggregation, 
+                                             addPeakMax_TSraw = addPeakMax, 
+                                             addPeakMin_TSraw = addPeakMin,
+                                             )
     self.TScollectionForAgg.print()   
-    
-    # Daten für Aggregation vorbereiten:
-    seriesDict = {}
-    weightDict = {}
-    for i in range(len(self.TSlistForAggregation)):
-        aTS : cTS_vector
-        aTS = self.TSlistForAggregation[i]
-        seriesDict[i] = aTS.d_i_raw_vec # Vektor zuweisen!
-        weightDict[i] = self.TScollectionForAgg.getWeight(aTS) # Wichtung ermitteln!
 
+    import pandas as pd    
     # seriesDict = {i : self.TSlistForAggregation[i].d_i_raw_vec for i in range(len(self.TSlistForAggregation))}    
-    import pandas as pd
-    dfSeries = pd.DataFrame(seriesDict, index = chosenTimeSeries)# eigentlich wäre TS als column schön, aber TSAM will die ordnen können.       
+    dfSeries = pd.DataFrame(self.TScollectionForAgg.seriesDict, index = chosenTimeSeries)# eigentlich wäre TS als column schön, aber TSAM will die ordnen können.       
 
     # Check, if timesteps fit in Period:
     stepsPerPeriod = periodLengthInHours / self.dtInHours[0] 
@@ -973,7 +1009,9 @@ class cCalculation :
                                       hasTSA = False,
                                       noTypicalPeriods = noTypicalPeriods,
                                       useExtremePeriods = useExtremePeriods,
-                                      weightDict = weightDict)
+                                      weightDict = self.TScollectionForAgg.weightDict,
+                                      addPeakMax = self.TScollectionForAgg.addPeak_Max_numbers,
+                                      addPeakMin = self.TScollectionForAgg.addPeak_Min_numbers)
     
     
     
