@@ -35,6 +35,7 @@ calc1_res.plotInAndOuts('Fernwaerme',stacked=True, plotAsPlotly = True)
 calc1_res.plotInAndOuts('BHKW2',stacked=True)
 
 calc1_res.plotShares('Fernwaerme', withoutStorage = True)
+calc1_res.plotShares('Fernwaerme', withoutStorage = True, plotAsPlotly  = True, unit='kWh')
 
 import matplotlib.pyplot as plt
 from flixPlotHelperFcts import *

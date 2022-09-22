@@ -206,8 +206,7 @@ class flix_results():
   #     self.getFullLoadHoursOfComp(comp)
       
   
-  def plotShares(self,busOrComponent, useInputs=True, withoutStorage = True,  minSum=.1, othersMax_rel=0.05):
-    
+  def plotShares(self,busOrComponent, useInputs=True, withoutStorage = True,  minSum=.1, othersMax_rel=0.05, plotAsPlotly = False, title = None, unit = 'FlowHours'):      
     (in_flows, out_flows) = self.getFlowsOf(busOrComponent)
     if useInputs:
       flows =in_flows 
@@ -225,7 +224,7 @@ class flix_results():
           allowed_i.append(i)
       flows = [flows[i] for i in allowed_i] # Gekürzte liste
       
-    
+
     sums = np.array([])
     labels = []
     totalSum = 0
@@ -245,29 +244,49 @@ class flix_results():
     if others_Sum >0:
       sums = np.append(sums,others_Sum)
       labels.append('others')
-    fig = plt.figure()
-    ax = fig.add_subplot()
-    # ax.title(busOrComponent)
-    title=busOrComponent
-    if useInputs:
-      title+= ' (supply)'
+
+    aText = "total: {:.0f}".format(sum(sums)) + ' ' + unit 
+
+    if title is None:
+        title=busOrComponent
+        if useInputs:
+          title+= ' (supply)'
+        else:
+          title+= ' (usage)'
+        
+
+    
+
+    def plot_matplotlib(sums, labels, title, aText):
+        fig = plt.figure()
+        ax = fig.add_subplot()
+        # ax.title(busOrComponent)
+        plt.title(title)
+        plt.pie(sums/sum(sums), labels = labels)            
+        fig.text(0.95, 0.05, aText,
+              verticalalignment='top', horizontalalignment='center',
+              transform=ax.transAxes,
+              color='black', fontsize=10)
+        # ax.text(0.95, 0.98, aText,
+        #       verticalalignment='top', horizontalalignment='right',
+        #       transform=ax.transAxes,
+        #       color='black', fontsize=10)
+        plt.show()
+    
+    def plot_plotly(sums, labels,title, aText):            
+        import plotly.graph_objects as go
+        fig = go.Figure(data=[go.Pie(labels=labels, values=sums)])
+        fig.update_layout(title_text = title,
+                          annotations = [dict(text=aText, x=0.95, y=0.05, font_size=20, align = 'right', showarrow=False)],
+                          )
+        fig.show()
+        
+    if plotAsPlotly:
+      plot_plotly    (sums, labels, title, aText)
     else:
-      title+= ' (usage)'
-    plt.title(title)
-    plt.pie(sums/sum(sums), labels = labels)
-    
-    aText = "Gesamt: {:.0f}".format(sum(sums)) + ' kWh' 
-    
-    fig.text(0.95, 0.05, aText,
-          verticalalignment='top', horizontalalignment='center',
-          transform=ax.transAxes,
-          color='black', fontsize=10)
-    # ax.text(0.95, 0.98, aText,
-    #       verticalalignment='top', horizontalalignment='right',
-    #       transform=ax.transAxes,
-    #       color='black', fontsize=10)
-    plt.show()
-    
+      plot_matplotlib(sums, labels, title, aText)
+                       
+      
   def plotInAndOuts(self, busOrComponent, stacked = False, renderer='browser', minFlowHours=0.1, plotAsPlotly = False, title = None):      
     '''      
     Parameters
