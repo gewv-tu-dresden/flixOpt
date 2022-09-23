@@ -4,12 +4,6 @@ Created on Thu Jun 16 11:19:17 2022
 
 @author: Panitz
 """
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Sep  4 11:26:10 2020
-
-@author: Panitz
-"""
 
 # mögliche Testszenarien für testing-tool:
    # abschnittsweise linear testen
