@@ -43,7 +43,7 @@ aTimeSeries = aTimeSeries.astype('datetime64')
 
 class mySystem():
 
-  def __init__(self, label, Q_th_Last, penaltyCosts = 1e5, switchOnCosts = None, investArgs = None, switchOn_maxNr_K1 = None, switchOn_maxNr_K2 = None, onHours_max_K1 = None, onHours_max_K2 = None):
+  def __init__(self, label, Q_th_Last, penaltyCosts = 1e5, switchOnCosts = None, investArgs = None, switchOn_maxNr_K1 = None, switchOn_maxNr_K2 = None, onHoursSum_max_K1 = None, onHoursSum_max_K2 = None):
     self.label = label
     # Effects
     costs = cEffectType('costs','€'      , 'Kosten', isStandard = True, isObjective = True)
@@ -62,11 +62,11 @@ class mySystem():
      
     # guter Kessel:
     self.K1 = cKessel('Kessel1', eta  = 0.5, costsPerRunningHour = 0,
-                        Q_th = cFlow(label   = 'Q_th', bus = Heat, nominal_val = 10 , switchOnCosts=switchOnCosts, switchOn_maxNr = switchOn_maxNr_K1, onHours_max = onHours_max_K1, investArgs = investArgs),
+                        Q_th = cFlow(label   = 'Q_th', bus = Heat, nominal_val = 10 , switchOnCosts=switchOnCosts, switchOn_maxNr = switchOn_maxNr_K1, onHoursSum_max = onHoursSum_max_K1, investArgs = investArgs),
                         Q_fu = cFlow(label   = 'Q_fu', bus = Gas)) 
     # schlechter Kessel
     self.K2 = cKessel('Kessel2', eta  = 0.4, costsPerRunningHour = 0,
-                        Q_th = cFlow(label   = 'Q_th', bus = Heat, nominal_val = 10 , switchOnCosts=switchOnCosts, switchOn_maxNr = switchOn_maxNr_K2, onHours_max = onHours_max_K2, investArgs = investArgs),
+                        Q_th = cFlow(label   = 'Q_th', bus = Heat, nominal_val = 10 , switchOnCosts=switchOnCosts, switchOn_maxNr = switchOn_maxNr_K2, onHoursSum_max = onHoursSum_max_K2, investArgs = investArgs),
                         Q_fu = cFlow(label   = 'Q_fu', bus = Gas))
 
     aWaermeLast = cSink  ('Wärmelast',sink   = cFlow('Q_th_Last' , bus = Heat, val_rel = Q_th_Last, nominal_val = 1))  
@@ -109,8 +109,8 @@ class mySystem():
       print('K2 Starts: ' + str(aCalc.results_struct.Kessel2.Q_th.nrSwitchOn)) 
     except: 
       pass
-    print('K1 onHours: ' + str(aCalc.results_struct.Kessel1.Q_th.onHours))
-    print('K2 onHours: ' + str(aCalc.results_struct.Kessel2.Q_th.onHours))
+    print('K1 onHoursSum: ' + str(aCalc.results_struct.Kessel1.Q_th.onHoursSum))
+    print('K2 onHoursSum: ' + str(aCalc.results_struct.Kessel2.Q_th.onHoursSum))
 
 
 # Test1a: #
@@ -131,9 +131,9 @@ assert ((struct.Kessel1.Q_th.nrSwitchOn == 0) and
        (struct.Kessel2.Q_th.nrSwitchOn == 3)), 'Test nicht erfolgreich'
 
 # Test2: #
-# -> onHours
-test2 = mySystem('test2', Q_th_Last, onHours_max_K1 = 0.5, onHours_max_K2 = 20)
+# -> onHoursSum
+test2 = mySystem('test2', Q_th_Last, onHoursSum_max_K1 = 0.5, onHoursSum_max_K2 = 20)
 struct = test2.modelAndSolve()
 test2.print()
-assert ((struct.Kessel1.Q_th.onHours == 0.5) and
-       (struct.Kessel2.Q_th.onHours == 2.5)), 'Test nicht erfolgreich'
+assert ((struct.Kessel1.Q_th.onHoursSum == 0.5) and
+       (struct.Kessel2.Q_th.onHoursSum == 2.5)), 'Test nicht erfolgreich'
